@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spotify Lyrics Finder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: white;
+      text-align: center;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .lyrics-container {
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      width: 90%;
+      animation: fadeIn 0.8s ease-in-out;
+      transition: all 0.3s ease;
+    }
+
+    .lyrics-container h2 {
+      margin-bottom: 10px;
+      font-size: 26px;
+      font-weight: 600;
+    }
+
+    .lyrics-container pre {
+      white-space: pre-wrap;
+      text-align: left;
+      font-size: 18px;
+      line-height: 1.5;
+    }
+
+    .refresh-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #007aff;
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease;
+    }
+
+    .refresh-button:hover {
+      background: #005bb5;
+    }
+
+    .refresh-button svg {
+      margin-left: 8px;
+      width: 20px;
+      height: 20px;
+    }
+
+    .loading {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #ffdd57;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .lyrics-container {
+        padding: 15px;
+      }
+
+      .lyrics-container h2 {
+        font-size: 22px;
+      }
+
+      .lyrics-container pre {
+        font-size: 16px;
+      }
+
+      .refresh-button {
+        font-size: 16px;
+        padding: 8px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Spotify Lyrics Finder</h1>
+  <div id="track-info" class="lyrics-container">
+    <h2 id="track-title">Lagu tidak ditemukan</h2>
+    <p id="track-artist">-</p>
+  </div>
+  <div id="lyrics" class="lyrics-container">
+    <pre>Menunggu lirik...</pre>
+  </div>
+  <button class="refresh-button" onclick="fetchLyrics()">
+    Refresh Lirik
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m0 0A9.956 9.956 0 014 12c0 5.523 4.477 10 10 10s10-4.477 10-10S19.523 2 14 2c-2.485 0-4.743.894-6.418 2.366M4.582 9H10" />
+    </svg>
+  </button>
+  <div id="loading" class="loading" style="display: none;">Mengambil lirik...</div>
+
+  <script>
+    async function checkLogin() {
+      try {
+        const response = await fetch("/lyrics/current");
+        if (response.status === 401) {
+          window.location.href = "/auth/login";
+        } else {
+          fetchLyrics();
+        }
+      } catch (error) {
+        document.getElementById("lyrics").innerText = "Terjadi kesalahan.";
+      }
+    }
+
+    async function fetchLyrics() {
+      document.getElementById("loading").style.display = "block";
+      try {
+        const response = await fetch("/lyrics/current");
+        if (!response.ok) throw new Error("Gagal mendapatkan lirik");
+
+        const data = await response.json();
+        document.getElementById("track-title").innerText = data.title || "Tidak ada judul";
+        document.getElementById("track-artist").innerText = data.artist || "Tidak ada artis";
+        document.getElementById("lyrics").querySelector("pre").innerText = data.lyrics || "Lirik tidak ditemukan.";
+      } catch (error) {
+        document.getElementById("lyrics").querySelector("pre").innerText = "Terjadi kesalahan saat mengambil lirik.";
+        checkLogin();
+      } finally {
+        document.getElementById("loading").style.display = "none";
+      }
+    }
+
+    checkLogin();
+    fetchLyrics();
+    setInterval(fetchLyrics, 10000);
+  </script>
+</body>
+</html>
