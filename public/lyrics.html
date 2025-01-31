@@ -148,8 +148,7 @@
         document.getElementById("track-artist").innerText = data.artist || "Tidak ada artis";
         document.getElementById("lyrics").querySelector("pre").innerText = data.lyrics || "Lirik tidak ditemukan.";
       } catch (error) {
-        document.getElementById("lyrics").querySelector("pre").innerText = "Terjadi kesalahan saat mengambil lirik.";
-        checkLogin();
+        document.getElementById("lyrics").querySelector("pre").innerText = "Terjadi kesalahan saat mengambil lirik. Refresh halaman dalam beberapa saat atau mengganti musik";
       } finally {
         document.getElementById("loading").style.display = "none";
       }
