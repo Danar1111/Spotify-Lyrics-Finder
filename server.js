@@ -41,8 +41,8 @@ const REDIRECT_URI = `http://${SERVER_IP}:${PORT}/callback`;
 
 let spotifyAccessToken = "";
 
-// **GET** `/auth/login` untuk memulai proses OAuth
-app.get("/auth/login", (req, res) => {
+// **GET** `/spotify` untuk memulai proses OAuth
+app.get("/spotify", (req, res) => {
     const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(
         REDIRECT_URI
     )}&scope=user-read-currently-playing`;
@@ -116,6 +116,6 @@ app.get("/lyrics", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server berjalan di: http://${SERVER_IP}:${PORT}`);
-  console.log(`Akses /auth/login untuk memulai proses login.`);
+  console.log(`Server berjalan di: http://${SERVER_IP}:${PORT}/spotify`);
+  console.log(`Akses /spotify untuk memulai proses login.`);
 });
